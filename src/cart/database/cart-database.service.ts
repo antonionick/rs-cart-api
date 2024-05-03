@@ -1,13 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'pg';
+import { Cart } from 'src/cart/models';
+
+interface IUserIdResult {
+  id: string;
+}
+
+interface ICartItemsResult {
+  product_id: string;
+  count: number;
+}
+
+const CART_BY_USER_ID_QUERY = 'SELECT id from carts where user_id = $1';
+const CART_ITEMS_BY_CART_ID_QUERY =
+  'SELECT product_id, count from cart_items where cart_id = $1';
 
 @Injectable()
 export class CartDatabaseService {
   private client: Client;
 
-  public async connect(): Promise<void> {
+  async findByUserId(userId: string): Promise<Cart> {
+    const client = await this.getClient();
+
+    const queryResult = await client.query<IUserIdResult>(
+      CART_BY_USER_ID_QUERY,
+      [userId],
+    );
+    const userCartId = queryResult.rows[0]?.id;
+
+    if (!userCartId) {
+      return null;
+    }
+
+    const cartItemsQueryResult = await client.query<ICartItemsResult>(
+      CART_ITEMS_BY_CART_ID_QUERY,
+      [userCartId],
+    );
+    const cartItems = cartItemsQueryResult.rows.map(cartItem => ({
+      count: cartItem.count,
+      product: { id: cartItem.product_id },
+    }));
+
+    return {
+      id: userCartId,
+      items: cartItems,
+    };
+  }
+
+  private async getClient(): Promise<Client> {
     if (this.client) {
-      return;
+      return this.client;
     }
 
     try {
@@ -26,7 +68,7 @@ export class CartDatabaseService {
 
       this.client = client;
 
-      console.log('connected');
+      return this.client;
     } catch (error) {
       console.error(error);
 

@@ -1,10 +1,9 @@
 export type Product = {
   id: string,
-  title: string,
-  description: string,
-  price: number,
+  title?: string,
+  description?: string,
+  price?: number,
 };
-
 
 export type CartItem = {
   product: Product,
