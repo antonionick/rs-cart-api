@@ -11,9 +11,21 @@ interface ICartItemsResult {
   count: number;
 }
 
-const CART_BY_USER_ID_QUERY = 'SELECT id from carts where user_id = $1';
+interface ICreateCartResult {
+  id: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  status: 'OPEN';
+}
+
+const CART_BY_USER_ID_QUERY = 'SELECT id from carts WHERE user_id = $1';
 const CART_ITEMS_BY_CART_ID_QUERY =
-  'SELECT product_id, count from cart_items where cart_id = $1';
+  'SELECT product_id, count from cart_items WHERE cart_id = $1';
+
+const CREATE_CART_QUERY =
+  "INSERT INTO carts (id, user_id, created_at, updated_at, status) VALUES (gen_random_uuid(), $1, CURRENT_DATE, CURRENT_DATE, 'OPEN') RETURNING *";
+
 
 @Injectable()
 export class CartDatabaseService {
@@ -44,6 +56,21 @@ export class CartDatabaseService {
     return {
       id: userCartId,
       items: cartItems,
+    };
+  }
+
+  async createCart(userId: string): Promise<Cart> {
+    const client = await this.getClient();
+
+    const createCartQueryResult = await client.query<ICreateCartResult>(
+      CREATE_CART_QUERY,
+      [userId],
+    );
+    const createdCart = createCartQueryResult.rows[0];
+
+    return {
+      id: createdCart.id,
+      items: []
     };
   }
 

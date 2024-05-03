@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { v4 } from 'uuid';
-
 import { Cart } from '../models';
 import { CartDatabaseService } from 'src/cart/database/cart-database.service';
 
@@ -16,15 +14,7 @@ export class CartService {
   }
 
   async createByUserId(userId: string): Promise<Cart> {
-    const id = v4(v4());
-    const userCart = {
-      id,
-      items: [],
-    };
-
-    this.userCarts[userId] = userCart;
-
-    return userCart;
+    return await this.cartDatabaseService.createCart(userId);
   }
 
   async findOrCreateByUserId(userId: string): Promise<Cart> {
