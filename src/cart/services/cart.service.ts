@@ -7,10 +7,8 @@ import { CartDatabaseService } from 'src/cart/database/cart-database.service';
 export class CartService {
   constructor(private readonly cartDatabaseService: CartDatabaseService) {}
 
-  private userCarts: Record<string, Cart> = {};
-
   async findByUserId(userId: string): Promise<Cart> {
-    return await this.cartDatabaseService.findByUserId(userId);
+    return await this.cartDatabaseService.findCart(userId);
   }
 
   async createByUserId(userId: string): Promise<Cart> {
@@ -35,7 +33,7 @@ export class CartService {
     return await this.findByUserId(userId);
   }
 
-  removeByUserId(userId): void {
-    this.userCarts[userId] = null;
+  async removeByUserId(userId: string): Promise<void> {
+    await this.cartDatabaseService.removeCart(userId);
   }
 }
