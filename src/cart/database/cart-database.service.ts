@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'pg';
-import { Cart } from 'src/cart/models';
+import { Cart, CartItem } from 'src/cart/models';
 
 interface IUserIdResult {
   id: string;
@@ -26,6 +26,8 @@ const CART_ITEMS_BY_CART_ID_QUERY =
 const CREATE_CART_QUERY =
   "INSERT INTO carts (id, user_id, created_at, updated_at, status) VALUES (gen_random_uuid(), $1, CURRENT_DATE, CURRENT_DATE, 'OPEN') RETURNING *";
 
+const UPDATE_CART_QUERY =
+  'UPDATE cart_items SET count = $1 WHERE cart_id = $2 and product_id = $3';
 
 @Injectable()
 export class CartDatabaseService {
@@ -70,8 +72,18 @@ export class CartDatabaseService {
 
     return {
       id: createdCart.id,
-      items: []
+      items: [],
     };
+  }
+
+  async updateCart(cartId: string, items: CartItem[]): Promise<void> {
+    const client = await this.getClient();
+
+    const updateCartQueries = items.map(item =>
+      client.query(UPDATE_CART_QUERY, [item.count, cartId, item.product.id]),
+    );
+
+    await Promise.all(updateCartQueries);
   }
 
   private async getClient(): Promise<Client> {

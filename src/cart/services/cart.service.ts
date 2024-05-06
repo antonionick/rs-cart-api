@@ -28,17 +28,11 @@ export class CartService {
   }
 
   async updateByUserId(userId: string, { items }: Cart): Promise<Cart> {
-    const { id, ...rest } = await this.findOrCreateByUserId(userId);
+    const { id } = await this.findOrCreateByUserId(userId);
 
-    const updatedCart = {
-      id,
-      ...rest,
-      items: [...items],
-    };
+    await this.cartDatabaseService.updateCart(id, items);
 
-    this.userCarts[userId] = { ...updatedCart };
-
-    return { ...updatedCart };
+    return await this.findByUserId(userId);
   }
 
   removeByUserId(userId): void {
