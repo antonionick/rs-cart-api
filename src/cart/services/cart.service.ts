@@ -33,6 +33,10 @@ export class CartService {
     return await this.findByUserId(userId);
   }
 
+  async updateCartStatusByCartId(cartId: string): Promise<void> {
+    await this.cartDatabaseService.updateCartStatusToOrdered(cartId);
+  }
+
   async removeByUserId(userId: string): Promise<void> {
     await this.cartDatabaseService.removeCart(userId);
   }

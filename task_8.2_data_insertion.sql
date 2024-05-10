@@ -1,19 +1,17 @@
 -- NOTE: Carts table insertion script
 
--- INSERT INTO carts (id, user_id, created_at, updated_at, status) 
--- VALUES 
--- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
--- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'ORDERED'),
+-- INSERT INTO carts (id, user_id, created_at, updated_at, status)
+-- VALUES
 -- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
 -- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
--- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'ORDERED'),
 -- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
 -- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
--- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'ORDERED'),
 -- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
--- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'ORDERED');
-
-select * from carts
+-- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
+-- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
+-- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
+-- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN'),
+-- (gen_random_uuid(), gen_random_uuid(), CURRENT_DATE, CURRENT_DATE, 'OPEN');
 
 -- NOTE: cart_items table insertion script
 

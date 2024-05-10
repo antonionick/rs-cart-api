@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Client } from 'pg';
 import { Cart, CartItem } from 'src/cart/models';
+import { DatabaseService } from 'src/shared/database.service';
 
 interface IUserIdResult {
   id: string;
@@ -28,16 +28,15 @@ const CREATE_CART_QUERY =
 
 const UPDATE_CART_ITEMS_QUERY =
   'UPDATE cart_items SET count = $1 WHERE cart_id = $2 and product_id = $3';
+const UPDATE_CART_QUERY = "UPDATE carts SET status = 'ORDERED' WHERE id = $1";
 
 const DELETE_CART_QUERY = 'DELETE FROM carts WHERE user_id = $1';
 const DELETE_CART_ITEMS_QUERY = 'DELETE FROM cart_items WHERE cart_id = $1';
 
 @Injectable()
 export class CartDatabaseService {
-  private client: Client;
-
   async findCart(userId: string): Promise<Cart> {
-    const client = await this.getClient();
+    const client = await DatabaseService.getClient();
 
     const queryResult = await client.query<IUserIdResult>(
       CART_BY_USER_ID_QUERY,
@@ -65,7 +64,7 @@ export class CartDatabaseService {
   }
 
   async createCart(userId: string): Promise<Cart> {
-    const client = await this.getClient();
+    const client = await DatabaseService.getClient();
 
     const createCartQueryResult = await client.query<ICreateCartResult>(
       CREATE_CART_QUERY,
@@ -80,7 +79,7 @@ export class CartDatabaseService {
   }
 
   async updateCart(cartId: string, items: CartItem[]): Promise<void> {
-    const client = await this.getClient();
+    const client = await DatabaseService.getClient();
 
     const updateCartQueries = items.map(item =>
       client.query(UPDATE_CART_ITEMS_QUERY, [
@@ -93,8 +92,14 @@ export class CartDatabaseService {
     await Promise.all(updateCartQueries);
   }
 
+  async updateCartStatusToOrdered(cartId: string): Promise<void> {
+    const client = await DatabaseService.getClient();
+
+    await client.query(UPDATE_CART_QUERY, [cartId]);
+  }
+
   async removeCart(userId: string): Promise<void> {
-    const client = await this.getClient();
+    const client = await DatabaseService.getClient();
 
     const queryResult = await client.query<IUserIdResult>(
       CART_BY_USER_ID_QUERY,
@@ -108,34 +113,5 @@ export class CartDatabaseService {
 
     await client.query(DELETE_CART_ITEMS_QUERY, [userCartId]);
     await client.query(DELETE_CART_QUERY, [userId]);
-  }
-
-  private async getClient(): Promise<Client> {
-    if (this.client) {
-      return this.client;
-    }
-
-    try {
-      const client = new Client({
-        host: process.env.host,
-        port: Number(process.env.port),
-        database: process.env.database,
-        user: process.env.user,
-        password: process.env.password,
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      });
-
-      await client.connect();
-
-      this.client = client;
-
-      return this.client;
-    } catch (error) {
-      console.error(error);
-
-      throw error;
-    }
   }
 }
